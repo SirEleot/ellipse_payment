@@ -1,0 +1,89 @@
+﻿*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: url(/img/bg.png) center no-repeat;
+    background-size: cover;
+    min-height: 100vh;
+    position: relative;
+}
+.main{
+    width: 80vh;
+    height: 50vh;
+}
+h1{
+    text-align: center;
+    color: white;
+    font-family: Arial;
+}
+.container {
+    height: 100vh;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.items-row{
+    display: flex;
+    justify-content: center;
+    margin-top: 5vh;
+}
+.item {
+    width: 30vh;
+    min-width: 30vh;
+    max-width: 30vh;
+    border-radius: 3.5vh;
+    overflow: hidden;
+    margin: 1vh 2vh;
+    cursor: pointer;
+    transition: transform .5s;
+    border: .4vh solid white;
+}
+.item:hover{
+    transform: scale(1.05);
+    border: .4vh solid green;
+}
+
+.fail {
+    color: red;
+}
+.success {
+    color: green;
+}
+h1.fail, h1.success {
+    font-size: 6vh;
+}
+h2.fail, h2.success {
+    font-family: Arial;
+    font-weight: 100;
+    font-size: 2vh;
+    margin-top: 5vh;
+    text-align: center;
+}
+
+.button{
+    background: none !important;
+    border: none !important;
+    outline: none !important;
+
+}
+a {
+    font-family: Arial;
+    text-decoration: none;
+    color: white;
+    text-transform: uppercase;
+    display: inline-block;
+    padding: 1vh 5vh;
+    border: .2vh solid white;
+    border-radius: .5vh;
+    margin: 5vh auto;
+}
+a:hover{
+    background-color: white;
+    color: black;
+    font-weight: 700;
+}

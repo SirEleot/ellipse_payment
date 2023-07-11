@@ -1,0 +1,18 @@
+﻿@using EllipsePaymentService.Models;
+
+@{
+    var payment = (Dictionary<string,string>)Model;
+}
+<div class="main">
+    <h1>Select payment method</h1>
+    <div class="items-row">
+        <form method="post" onclick="sendForm(this)" asp-antiforgery="false">
+            <input type="hidden" value="card" name="method" />           
+            <img src="/img/card.jpg" alt="clarna" class="item" />
+        </form>
+        <form method="post" onclick="sendForm(this)" asp-antiforgery="false" >
+            <input type="hidden" value="clarna" name="method" />           
+            <img src="/img/clarna.svg" alt="clarna" class="item" />
+        </form>
+    </div>
+</div>

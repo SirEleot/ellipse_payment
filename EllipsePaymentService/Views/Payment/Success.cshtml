@@ -1,0 +1,14 @@
+﻿
+@{
+    ViewData["Title"] = "Fail";
+    var message = (string)Model;
+}
+
+<h1 class="success">Success payment</h1>
+@if (message != null)
+{
+    <h2 class="success">@message</h2>
+}
+
+
+@Html.ActionLink("Return", "return", "Payment")
