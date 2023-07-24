@@ -35,15 +35,31 @@ namespace EllipsePaymentService.Services
 
         public string GenerateSign(string orderId, string amount, string email, PaymentMethod method)
         {
+            Console.WriteLine($"sign amount input: {amount}");
             var _endpoint = method.Url.Split('/').Last();
+            float amount_float = 0;
+            try
+            {
+
+                amount_float = Convert.ToSingle(amount);
+            }
+            catch (Exception)
+            {
+
+                amount_float = Convert.ToSingle(amount.Replace('.', ','));
+            }
+            Console.WriteLine($"sign amount_float input: {amount_float}");
+            var amount_in_minimal = (int)Math.Round(amount_float * 100);
+            Console.WriteLine($"sign amount_in_minimal input: {amount_in_minimal}");
             string input = string.Concat(new string[]
             {
                 _endpoint,
                 orderId,
-                amount.Replace(".", ""),
+                amount_in_minimal.ToString(),
                 email,
                 method.Secret
             });
+            Console.WriteLine($"sign string: {input}");
             return GetSha1(input);
         }        
 

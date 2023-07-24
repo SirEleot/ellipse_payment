@@ -38,7 +38,8 @@ namespace EllipsePaymentService.Controllers
         async public Task<IActionResult> Index([FromQuery] BasePaymentRequest request)
         {
             List<string> missing_fields;
-           
+            FillAdditionalDataToRequest(request);
+
             if (!IsValidPaymentReqeust(request, out missing_fields))
                 return ValidationError(missing_fields);
 
@@ -50,6 +51,7 @@ namespace EllipsePaymentService.Controllers
         public async Task<IActionResult> Index([FromQuery] BasePaymentRequest request, [FromForm]string method)
         {
             string encrypted_account_data;
+            request.amount = request.amount.Replace(',', '.');
             if (!HttpContext.Request.Cookies.TryGetValue("ellpise_account", out encrypted_account_data))
                 return Ok(new AccountResponse(Errors.Errors.AccountNotAuthorized));
 
@@ -57,6 +59,7 @@ namespace EllipsePaymentService.Controllers
 
             List<string> missing_fields;
 
+            FillAdditionalDataToRequest(request);
             if (!IsValidPaymentReqeust(request, out missing_fields) || method == null || !_methods.Any(m => m.Name == method))
                 return ValidationError(missing_fields);
 
@@ -70,12 +73,21 @@ namespace EllipsePaymentService.Controllers
                 using var client = new HttpClient();
                 var responce = await client.PostAsync(payment_method.Url, formContent);
                 var content = await responce.Content.ReadAsStringAsync();
+                Console.WriteLine($"response {content}");
                 var result = HttpUtility.ParseQueryString(content);
 
                 if (result.Get("type").Trim() == "async-form-response")
+                {
                     return Redirect(result.Get("redirect-url"));
+                }
                 else
-                    return Redirect(Url.Action("Fail", "Payment"));
+                {
+                    var message = new Dictionary<string, string>
+                    {
+                        { "message", result.Get("error-message") }
+                    };
+                    return Redirect(Url.Action("Fail", "Payment", message));
+                }
             }
             catch (Exception)
             {
@@ -92,12 +104,13 @@ namespace EllipsePaymentService.Controllers
         [HttpPost("callback"), HttpGet("callback")]
         public IActionResult Callback(string status, string orderid, string client_orderid, string control)
         {
-            var query = Request.Query.FirstOrDefault(q=>q.Key == "status");
             var method_name = client_orderid.Split('_')[0];
             var method = _methods.First(m => m.Name == method_name);
 
             if(_sequre.IsSignValid(status, orderid, client_orderid, control, method))
+            {
                 _accountService.UpdatePaymentStatus(status, orderid, client_orderid);
+            }
 
             return Ok("ok");
         }
@@ -120,7 +133,7 @@ namespace EllipsePaymentService.Controllers
             var props = request.GetType().GetProperties();
             misssing_fields = new List<string>();
             foreach (var prop in props)
-            {
+            {                
                 var value = prop.GetValue(request);
                 if (value == null)
                     misssing_fields.Add(prop.Name);
@@ -137,6 +150,18 @@ namespace EllipsePaymentService.Controllers
         {
             var payment_json = JsonSerializer.Serialize(request);
             return JsonSerializer.Deserialize<Dictionary<string, string>>(payment_json);
+        }
+
+        private void FillAdditionalDataToRequest(BasePaymentRequest request)
+        {
+            request.ipaddress = HttpContext.Connection.RemoteIpAddress.ToString();
+
+            if (string.IsNullOrEmpty(request.currency))
+                request.currency = "EUR";
+
+            if (string.IsNullOrEmpty(request.order_desc))
+                request.order_desc = "Top up";
+
         }
     }
 }

@@ -15,7 +15,7 @@ namespace EllipsePaymentService.Models
         public string email { get; set; }
         public string amount { get; set; }
         public string currency { get; set; }
-        public string order_desc { get; set; }       
+        public string order_desc { get; set; }
 
     }
 }

@@ -21,10 +21,10 @@ namespace EllipsePaymentService.Controllers
             string encrypted_account_data;
 
             if (!HttpContext.Request.Cookies.TryGetValue("ellpise_account", out encrypted_account_data))
-                return Ok(new AccountResponse(Errors.Errors.AccountNotAuthorized));
+                return GetResponse(new AccountResponse(Errors.Errors.AccountNotAuthorized));
 
             var account = _accountService.GetAccount(encrypted_account_data);
-            return Ok(account);
+            return GetResponse(account);
         }
 
         [HttpPost("login")]
@@ -44,8 +44,7 @@ namespace EllipsePaymentService.Controllers
                 HttpContext.Response.Cookies.Delete("ellpise_account");
                 HttpContext.Response.Cookies.Append("ellpise_account", encrypted_account_data, cookieOptions);
             }
-
-            return Ok(response);
+            return GetResponse(response);
         }
 
         [HttpPost("logout")]
@@ -65,8 +64,15 @@ namespace EllipsePaymentService.Controllers
                 HttpContext.Response.Cookies.Delete("ellpise_account");
                 HttpContext.Response.Cookies.Append("ellpise_account", "", cookieOptions);
             }
+            return Ok();
+        }
 
-            return Ok(new AccountResponse(Errors.Errors.AccountNotAuthorized));
+        private IActionResult GetResponse(AccountResponse account_response)
+        {
+            if (account_response.Status != 200)
+                return Problem(statusCode:account_response.Status, detail: account_response.Description);
+            else
+                return Ok(account_response);
         }
     }
 }

@@ -57,7 +57,19 @@ namespace EllipsePaymentService.Services
 
         public void AddCoins(string amount, string socialclubId)
         {
-            Query("UPDATE `accounts` SET `gocoins`= `gocoins` + @prop0 FROM  WHERE `socialclubid`=@prop1", amount, socialclubId);           
+            float amount_float = 0;
+            try
+            {
+
+                amount_float = Convert.ToSingle(amount);
+            }
+            catch (Exception)
+            {
+
+                amount_float = Convert.ToSingle(amount.Replace('.', ','));
+            }
+            Console.WriteLine($"add {amount_float} coins for {socialclubId}");
+            Query("UPDATE `accounts` SET `gocoins`= `gocoins` + @prop0 WHERE `socialclubid`=@prop1", amount_float, socialclubId);           
         }
 
         private List<PaymentInfo> GetPaymentHistory(string socialClubId)
@@ -92,8 +104,8 @@ namespace EllipsePaymentService.Services
         }
 
         public void UpdateOrder(Order order)
-        {
-            Query("UPDATE `fyst` SET `updated`=@prop0, `status`=@prop1, `fyst_id`=@prop2, WHERE `id`=@prop3", order.Date.ToString("s"), order.Status, order.FystId, order.Id);            
+        {           
+            Query("UPDATE `fyst` SET `updated`=@prop0, `status`=@prop1, `fyst_id`=@prop2 WHERE `id`=@prop3", order.Date.ToString("s"), order.Status, order.FystId, order.Id);            
         }
 
 
@@ -150,7 +162,18 @@ namespace EllipsePaymentService.Services
 
         internal int CreateNewOrder(BasePaymentRequest request, string socialclubid)
         {
-            var data = QueryRead($"INSERT INTO `fyst` (`sum`,`socialclubid`) VALUES(@prop0, @prop1); SELECT @@identity;", request.amount, socialclubid);
+            float amount_float = 0;
+            try
+            {
+
+                amount_float = Convert.ToSingle(request.amount);
+            }
+            catch (Exception)
+            {
+
+                amount_float = Convert.ToSingle(request.amount.Replace('.', ','));
+            }
+            var data = QueryRead($"INSERT INTO `fyst` (`sum`,`socialclubid`) VALUES(@prop0, @prop1); SELECT @@identity;", amount_float, socialclubid);
             var id = Convert.ToInt32(data.Rows[0][0]);
             return id;
         }

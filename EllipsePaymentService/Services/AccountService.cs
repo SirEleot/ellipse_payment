@@ -38,12 +38,12 @@ namespace EllipsePaymentService.Services
         {
             var order_id = client_orderid.Split('_')[1];
             var order = _dbService.GetOrderById(order_id);
-            _dbService.UpdateOrder(order);
             if (order.Status == "PROCESSING")
             {
                 order.Status = status.ToUpper();
                 order.Date = DateTime.Now;
                 order.FystId = orderid;
+                _dbService.UpdateOrder(order);
 
                 if (order.Status == "APPROVED")
                     _dbService.AddCoins(order.Sum, order.SocialclubId);

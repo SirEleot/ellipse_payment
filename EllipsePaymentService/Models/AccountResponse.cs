@@ -6,7 +6,8 @@ namespace EllipsePaymentService.Models
     {
         public AccountResponse(Errors.Errors error)
         {
-            Error = new Error(error);
+            Status = (int)error;
+            Description = ErrorHandler.GetErrorDescription(error);
             Status = (int)error;
         }
 
@@ -16,7 +17,7 @@ namespace EllipsePaymentService.Models
             Status = 200;
         }
         public int Status { get; set; }
-        public Error Error { get; set; }
+        public string Description { get; set; }
         public Account Account { get; set; }
     }
 }
